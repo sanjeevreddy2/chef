@@ -1,0 +1,182 @@
+Chef has three major components:
+
+Workstation
+Server
+Nodes
+==============================================
+
+Following are the steps to install Chef:
+
+Install Chef DK (Development Kit) on Chef Workstation
+Setup a Chef Server
+Create a Recipe or a Cookbook / download a Cookbook from Chef Supermarket in Workstation
+Upload a Cookbook on the Chef Server
+Connect A Node To The Chef Server
+Deploy the Cookbook from the Server to the Node
+
+
+
+====================================
+Setting up workstation:
+====================================
+yum install wget
+#####download package from:https://downloads.chef.io/chefdk
+
+wget https://packages.chef.io/stable/el/6/chefdk-1.0.3-1.el6.x86_64.rpm
+rpm -ivh chefdk-1.0.3-1.el6.x86_64.rpm
+==================================================
+mkdir chef-repo
+vi srini.rb
+file 'sri' do
+  content "this is test file"
+end
+==================================================
+chef-apply srini.rb
+
+vi sri.rb
+file 'myfile' do
+ action :create
+ content "hi how r u"
+end
+
+chef-apply sri.rb
+=========================================
+vi srini.rb
+package 'httpd' do
+   action :install
+end
+
+service 'httpd' do
+  action [:enale, ;start]
+end
+
+file '/var/www/html/index.html' do
+ content '<html>
+ <body>
+   <h1>Hello my name is chef</h1>
+ <body>
+'
+end
+
+curl localhost
+===========================================
+Create Cookbooks
+Mkdir cookbook
+chef generate cookbook learn_chef
+cd cookbook
+yum install tree
+tree
+
+chef generate template learn_chef index.html
+tree
+vim learn_chef/templates/default/index.html.erb
+Hello i m chef
+
+vim learn_chef/recipes/default.rb
+
+package 'httpd' do
+   action :install
+end
+
+service 'httpd' do
+  action [:enale, ;start]
+end
+
+file '/var/www/html/index.html' do
+  source 'index.html.erb' 
+
+cd..
+cd chef_repo
+chef-client --local-mode --runlist 'recipe[learn_chef]'
+
+curl localhost
+
+organisation----administration----download starter
+
+cd chef_repo/cookbooks/learn_chef/recipes
+vi default.rb
+
+knife cookbook upload learn_chef httpd
+
+in server----policies----cookbooks
+
+ping node(192.168.56.2)
+knife bootstrap 192.168.56.10 --ssh-user xxxx --ssh--password xxxx --use-sudo-password --node-name cnode --run-list 'recipe[learnchef]'
+knife bootstrap 192.168.56.102 --sudo -x username -p password -N "nodename"
+
+
+
+
+==========================================
+Setting up server
+===========================================
+Setup Chef Server
+go to---->manage.chef.io
+Click on the settings icon on the right hand side and click on Starter Kit.
+Now you will get an option to download the Starter Kit. Just click on it to download the Starter Kit zip file.
+Move this file to your root directory. Now unzip this file by using unzip command in your terminal. You will notice that it includes a directory called chef-repo.
+
+unzip chef-starter.zip
+scp -i all.pem chef-starter_2.zip  ec2-user@ec2-35-154-205-249.ap-south-1.compute.amazonaws.com:/home/ec2-user
+mv starter /root/chef-repo/cookbooks
+========================================
+
+ Download A Cookbook From Chef Supermarket In Workstation
+
+cd chef-repo
+knife cookbook site download learn_chef_httpd
+tar -xvf learn_chef_httpd-0.2.0.tar.gz
+
+cd /root/chef-repo/learn_chef_httpd/recipes
+cat default.rb
+==============================================
+Upload A Cookbook In The Chef Server
+
+mv /root/chef-repo/learn_chef_httpd /root/chef-repo/cookbooks
+cd /root/chef-repo/cookbooks
+knife cookbook upload learn_chef_httpd
+
+
+Verify the Cookbook from the Chef Server Management console. In the policy section, you will find the Cookbook that you have uploaded. Refer the screenshot below:
+================================================
+5. Connect A Node To The Chef Server
+in workstation:
+
+knife bootstrap 192.168.56.102 --ssh-user root --ssh-password srini --node-name chefNode
+knife bootstrap 192.168.56.102 --sudo -x username -p password -N "nodename"
+Knife node list
+
+Deploy The Cookbook From The Server To The Node
+knife node list
+knife node show node1 xxxx(node name)
+
+chef-client
+
+
+************************************************
+Setting up and configuring chef server manually
+************************************************
+yum install -y wget curl
+hostname -f
+wget https://packages.chef.io/files/stable/chef-server/12.15.8/el/7/chef-server-core-12.15.8-1.el7.x86_64.rpm
+rpm -ivh chef-server-core-12.15.8-1.el7.x86_64.rpm
+
+chef-server-ctl reconfigure
+chef-server-ctl user-create USER_NAME FIRST_NAME LAST_NAME EMAIL 'PASSWORD' --filename /tmp/to/user_name.pem
+chef-server-ctl user-create ajain Anuket Jain ajain@techoism.com 'redhat' --filename /opt/chefuser/ajain.pem
+
+chef-server-ctl org-create short_name 'full_organization_name' --association_user user_name --filename ORGANIZATION-validator.pem
+chef-server-ctl org-create ajaindevops2017 'Technical World' --association_user ajain --filename /opt/cheforg/technical.pem
+
+Configure Chef Management Console
+
+wget https://packages.chef.io/files/stable/chef-manage/2.5.4/el/7/chef-manage-2.5.4-1.el7.x86_64.rpm
+rpm -ivh chef-manage-2.5.4-1.el7.x86_64.rpm
+
+chef-server-ctl reconfigure
+chef-manage-ctl reconfigure        
+
+
+http://chef.techoism.local
+OR
+http://192.168.1.101
